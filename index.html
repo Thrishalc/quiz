@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#11131b">
+    <meta name="description" content="Put your knowledge to the test with a quick, interactive quiz.">
+    <title>The Curious Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="The Curious Quiz home">
+          <span class="brand-mark" aria-hidden="true">?</span>
+          <span>curious<span class="brand-dot">.</span></span>
+        </a>
+        <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="true" aria-label="Mute sound effects">
+          <span class="sound-icon" aria-hidden="true">♪</span>
+          <span id="sound-label">Sound on</span>
+        </button>
+      </header>
+
+      <main class="main-content">
+        <section class="screen intro-screen" id="intro-screen" aria-labelledby="intro-title">
+          <div class="intro-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> A LITTLE CHALLENGE</p>
+            <h1 id="intro-title">How curious<br>are <span>you?</span></h1>
+            <p class="intro-description">Six questions, a ticking clock, and a chance to learn something new. Trust your instincts and see where curiosity takes you.</p>
+            <div class="quiz-facts" aria-label="Quiz details">
+              <span><span class="fact-icon" aria-hidden="true">◷</span> 20 seconds each</span>
+              <span><span class="fact-icon" aria-hidden="true">✳</span> 6 questions</span>
+            </div>
+            <button class="primary-button start-button" id="start-button" type="button" disabled>
+              <span id="start-label">Loading quiz</span>
+              <span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+            <p class="error-message" id="load-error" role="alert" hidden></p>
+          </div>
+          <div class="intro-art" aria-hidden="true">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="art-spark spark-one">✳</div>
+            <div class="art-spark spark-two">✦</div>
+            <div class="art-card">
+              <span class="art-card-label">TODAY'S REMINDER</span>
+              <span class="art-card-question">The best<br>answers start<br>with a <em>question.</em></span>
+              <span class="art-card-foot"><span></span> STAY CURIOUS</span>
+            </div>
+            <span class="art-caption">01 — 06</span>
+          </div>
+        </section>
+
+        <section class="screen quiz-screen" id="quiz-screen" aria-labelledby="question-title" hidden>
+          <div class="quiz-topline">
+            <span class="question-count" id="question-count">QUESTION 01 <span>/ 06</span></span>
+            <span class="category-label" id="category-label"></span>
+          </div>
+          <div class="progress-track" role="progressbar" id="question-progress" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0">
+            <span class="progress-fill" id="progress-fill"></span>
+          </div>
+
+          <div class="question-content" id="question-content" aria-live="polite">
+            <div class="question-heading">
+              <h1 id="question-title"></h1>
+              <div class="timer" id="timer" aria-label="Time remaining">
+                <svg class="timer-ring" viewBox="0 0 48 48" aria-hidden="true">
+                  <circle class="timer-ring-track" cx="24" cy="24" r="20"></circle>
+                  <circle class="timer-ring-fill" id="timer-ring-fill" cx="24" cy="24" r="20"></circle>
+                </svg>
+                <span class="timer-number" id="timer-number">20</span>
+              </div>
+            </div>
+            <div class="timer-track" aria-hidden="true"><span id="timer-bar"></span></div>
+            <div class="options-list" id="options-list"></div>
+            <div class="answer-feedback" id="answer-feedback" role="status" hidden>
+              <div class="feedback-copy">
+                <span class="feedback-title" id="feedback-title"></span>
+                <span class="feedback-explanation" id="feedback-explanation"></span>
+              </div>
+              <button class="next-button" id="next-button" type="button">
+                <span id="next-label">Next question</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+          <p class="quiz-hint"><span aria-hidden="true">↳</span> Choose the best answer. The clock is ticking.</p>
+        </section>
+
+        <section class="screen results-screen" id="results-screen" aria-labelledby="results-title" hidden>
+          <div class="results-heading">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> THAT'S A WRAP</p>
+            <h1 id="results-title">Nice work,<br><span id="results-remark">curious mind.</span></h1>
+            <p class="results-description" id="results-description"></p>
+          </div>
+          <div class="score-card">
+            <div class="score-stat">
+              <span class="score-label">YOUR SCORE</span>
+              <span class="score-value" id="score-percentage">0<span>%</span></span>
+            </div>
+            <div class="score-divider"></div>
+            <div class="score-stat">
+              <span class="score-label">CORRECT</span>
+              <span class="score-count" id="score-count">0<span> / 6</span></span>
+            </div>
+            <div class="score-decoration" aria-hidden="true">✳</div>
+          </div>
+          <div class="review-heading">
+            <h2>Your answer review</h2>
+            <span id="review-summary"></span>
+          </div>
+          <div class="review-list" id="review-list"></div>
+          <button class="primary-button retry-button" id="retry-button" type="button">
+            Try again <span class="button-arrow" aria-hidden="true">↻</span>
+          </button>
+        </section>
+      </main>
+      <footer class="site-footer">
+        <span>MADE FOR THE CURIOUS</span>
+        <span class="footer-decoration" aria-hidden="true">✳</span>
+        <span>TAKE YOUR TIME (WELL, 20 SECONDS)</span>
+      </footer>
+    </div>
+  </body>
+</html>

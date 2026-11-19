@@ -1,0 +1,47 @@
+{
+  "durationSeconds": 20,
+  "questions": [
+    {
+      "category": "Space",
+      "question": "Which planet has the most moons confirmed so far?",
+      "options": ["Jupiter", "Saturn", "Neptune", "Uranus"],
+      "answer": 1,
+      "explanation": "Saturn currently leads the count, with more than 140 confirmed moons."
+    },
+    {
+      "category": "The natural world",
+      "question": "What is the only mammal capable of true, sustained flight?",
+      "options": ["Flying squirrel", "Sugar glider", "Bat", "Colugo"],
+      "answer": 2,
+      "explanation": "Bats are the only mammals that can power their own sustained flight. The others glide."
+    },
+    {
+      "category": "Science",
+      "question": "What is the chemical symbol for the element gold?",
+      "options": ["Go", "Gd", "Ag", "Au"],
+      "answer": 3,
+      "explanation": "Au comes from the Latin word for gold, aurum."
+    },
+    {
+      "category": "Geography",
+      "question": "Which is the world's largest desert?",
+      "options": ["The Sahara", "The Gobi", "The Antarctic Desert", "The Arabian Desert"],
+      "answer": 2,
+      "explanation": "Antarctica is a polar desert: it receives very little precipitation and is the largest desert on Earth."
+    },
+    {
+      "category": "The natural world",
+      "question": "What is the fastest land animal?",
+      "options": ["Pronghorn", "Cheetah", "Lion", "Springbok"],
+      "answer": 1,
+      "explanation": "A cheetah can sprint at around 100 km/h (60 mph) over short distances."
+    },
+    {
+      "category": "The human body",
+      "question": "Which part of the human body has the smallest bones?",
+      "options": ["The hand", "The inner ear", "The nose", "The foot"],
+      "answer": 1,
+      "explanation": "The three tiny bones in the middle ear transmit sound vibrations. The stapes is the smallest bone in the body."
+    }
+  ]
+}
