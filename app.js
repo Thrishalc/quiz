@@ -32,6 +32,8 @@ const optionKeys = ["A", "B", "C", "D"];
 const timerCircumference = 2 * Math.PI * 20;
 const state = {
   questions: [],
+  questionPool: [],
+  questionCount: 6,
   durationSeconds: 20,
   currentIndex: 0,
   answers: [],
@@ -42,6 +44,35 @@ const state = {
   audioContext: null,
 };
 
+function normalizeQuiz(data) {
+  const quiz = Array.isArray(data) ? { questions: data } : data;
+  if (!quiz || !Array.isArray(quiz.questions)) return quiz;
+
+  return {
+    durationSeconds: quiz.durationSeconds ?? 20,
+    questionCount: quiz.questionCount ?? 6,
+    questions: quiz.questions.map((question) => {
+      if (!question) return question;
+      const options = Array.isArray(question.options)
+        ? question.options
+        : optionKeys.map((key) => question[key]);
+      const answer = Number.isInteger(question.answer)
+        ? question.answer
+        : Number.isInteger(question.correctIndex)
+          ? question.correctIndex
+          : optionKeys.indexOf(question.answer);
+
+      return {
+        category: question.category ?? "General Knowledge",
+        question: question.question,
+        options,
+        answer,
+        explanation: question.explanation ?? "",
+      };
+    }),
+  };
+}
+
 function isValidQuiz(data) {
   return (
     data &&
@@ -49,8 +80,12 @@ function isValidQuiz(data) {
     data.durationSeconds > 0 &&
     Array.isArray(data.questions) &&
     data.questions.length > 0 &&
+    Number.isInteger(data.questionCount) &&
+    data.questionCount > 0 &&
+    data.questionCount <= data.questions.length &&
     data.questions.every(
       (question) =>
+        question &&
         typeof question.category === "string" &&
         typeof question.question === "string" &&
         Array.isArray(question.options) &&
@@ -70,19 +105,22 @@ async function loadQuiz() {
     if (!response.ok) {
       throw new Error(`The quiz data could not be loaded (HTTP ${response.status}).`);
     }
-    const data = await response.json();
+    const data = normalizeQuiz(await response.json());
     if (!isValidQuiz(data)) {
       throw new Error("The quiz data is incomplete or invalid.");
     }
 
-    state.questions = data.questions;
+    state.questionPool = data.questions;
+    state.questionCount = data.questionCount;
     state.durationSeconds = data.durationSeconds;
-    document.querySelector("#question-progress").setAttribute("aria-valuemax", String(state.questions.length));
-    document.querySelector("#score-count").innerHTML = `0<span> / ${state.questions.length}</span>`;
+    document.querySelector("#question-progress").setAttribute("aria-valuemax", String(state.questionCount));
+    document.querySelector("#score-count").innerHTML = `0<span> / ${state.questionCount}</span>`;
     document.querySelector(".quiz-facts > span:nth-child(1)").innerHTML =
       `<span class="fact-icon" aria-hidden="true">◷</span> ${state.durationSeconds} seconds each`;
     document.querySelector(".quiz-facts > span:nth-child(2)").innerHTML =
-      `<span class="fact-icon" aria-hidden="true">✳</span> ${state.questions.length} questions`;
+      `<span class="fact-icon" aria-hidden="true">✳</span> ${state.questionCount} questions`;
+    document.querySelector(".art-caption").textContent =
+      `01 — ${String(state.questionCount).padStart(2, "0")}`;
     startLabel.textContent = "Start the quiz";
     startButton.disabled = false;
   } catch (error) {
@@ -99,8 +137,16 @@ function showScreen(activeScreen) {
 }
 
 function startQuiz() {
+  const shuffled = [...state.questionPool];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  state.questions = shuffled.slice(0, state.questionCount);
   state.currentIndex = 0;
   state.answers = [];
+  progress.setAttribute("aria-valuemax", String(state.questions.length));
+  document.querySelector("#score-count").innerHTML = `0<span> / ${state.questions.length}</span>`;
   showScreen("quiz");
   renderQuestion();
 }
@@ -187,16 +233,16 @@ function submitAnswer(selectedIndex) {
 
   answerFeedback.hidden = false;
   answerFeedback.classList.toggle("is-incorrect", !isCorrect);
+  const correctAnswerFeedback =
+    `The correct answer is ${question.options[question.answer]}.${question.explanation ? ` ${question.explanation}` : ""}`;
   feedbackTitle.textContent = selectedIndex === null
     ? "Time's up"
     : isCorrect
       ? "That's right!"
       : "Not quite";
-  feedbackExplanation.textContent = selectedIndex === null
-    ? `The correct answer is ${question.options[question.answer]}. ${question.explanation}`
-    : isCorrect
-      ? question.explanation
-      : `The correct answer is ${question.options[question.answer]}. ${question.explanation}`;
+  feedbackExplanation.textContent = selectedIndex === null || !isCorrect
+    ? correctAnswerFeedback
+    : question.explanation || "Correct!";
   nextLabel.textContent = state.currentIndex === state.questions.length - 1 ? "See your results" : "Next question";
   playFeedbackSound(isCorrect);
 }
@@ -258,10 +304,13 @@ function showResults() {
     correct.innerHTML = `<strong>Correct: ${escapeHtml(question.options[question.answer])}</strong>`;
     answers.append(chosen, correct);
 
-    const explanation = document.createElement("p");
-    explanation.className = "review-explanation";
-    explanation.textContent = question.explanation;
-    item.append(prompt, answers, explanation);
+    item.append(prompt, answers);
+    if (question.explanation) {
+      const explanation = document.createElement("p");
+      explanation.className = "review-explanation";
+      explanation.textContent = question.explanation;
+      item.append(explanation);
+    }
     reviewList.append(item);
   });
 
